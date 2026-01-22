@@ -12,15 +12,20 @@ Usage:
 """
 
 import logging
+import os
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from db import init_db, close_db
 from routes import tasks_router, auth_router
+
+# Load environment variables
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -71,12 +76,20 @@ app = FastAPI(
 # CORS Configuration
 # ============================================================================
 
+# Build allowed origins list from environment
+cors_origins = [
+    "http://localhost:3000",  # Next.js frontend (development)
+    "http://127.0.0.1:3000",
+]
+
+# Add production frontend URL if configured
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    cors_origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # Next.js frontend (development)
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

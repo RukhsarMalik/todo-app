@@ -1,0 +1,8 @@
+asyncpg>=0.31.0
+email-validator>=2.3.0
+fastapi>=0.128.0
+passlib[bcrypt]>=1.7.4
+python-dotenv>=1.2.1
+python-jose[cryptography]>=3.5.0
+sqlmodel>=0.0.31
+uvicorn[standard]>=0.40.0
