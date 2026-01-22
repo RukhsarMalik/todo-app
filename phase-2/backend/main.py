@@ -80,11 +80,12 @@ app = FastAPI(
 cors_origins = [
     "http://localhost:3000",  # Next.js frontend (development)
     "http://127.0.0.1:3000",
+    "https://frontend-ten-opal-98.vercel.app",  # Production frontend
 ]
 
-# Add production frontend URL if configured
+# Add production frontend URL if configured (backup)
 frontend_url = os.getenv("FRONTEND_URL")
-if frontend_url:
+if frontend_url and frontend_url not in cors_origins:
     cors_origins.append(frontend_url)
 
 app.add_middleware(
