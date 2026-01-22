@@ -201,7 +201,7 @@ async def get_profile(
     Returns:
         UserResponse: User profile information.
     """
-    user_id = current_user["sub"]
+    user_id = current_user["user_id"]
     statement = select(User).where(User.id == user_id)
     result = await session.execute(statement)
     user = result.scalar_one_or_none()
@@ -237,7 +237,7 @@ async def update_profile(
     Returns:
         UserResponse: Updated user profile.
     """
-    user_id = current_user["sub"]
+    user_id = current_user["user_id"]
     statement = select(User).where(User.id == user_id)
     result = await session.execute(statement)
     user = result.scalar_one_or_none()
@@ -286,7 +286,7 @@ async def change_password(
         HTTPException: 400 if current password is incorrect.
         HTTPException: 400 if new password is same as current.
     """
-    user_id = current_user["sub"]
+    user_id = current_user["user_id"]
     statement = select(User).where(User.id == user_id)
     result = await session.execute(statement)
     user = result.scalar_one_or_none()

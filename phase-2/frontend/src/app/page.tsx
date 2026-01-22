@@ -2,7 +2,7 @@
 
 /**
  * Home page with auth-based redirect.
- * Authenticated users → /tasks
+ * Authenticated users → /dashboard
  * Non-authenticated users → /login
  */
 
@@ -18,7 +18,7 @@ export default function Home() {
   useEffect(() => {
     if (!auth.isLoading) {
       if (auth.isAuthenticated) {
-        router.replace('/tasks');
+        router.replace('/dashboard');
       } else {
         router.replace('/login');
       }
