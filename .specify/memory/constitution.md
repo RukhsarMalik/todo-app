@@ -1,12 +1,24 @@
 <!--
 Sync Impact Report:
-- Version: None → 1.0.0 (Initial constitution for Evolution of Todo Hackathon Phase I)
-- Principles added: 7 core principles established
-- Sections added: Project Vision, Core Principles, Technical Standards, Development Workflow, Quality Gates, Governance
+- Version: 2.0.0 → 3.0.0 (MAJOR: Added Phase III AI Chatbot with 5 new principles)
+- Principles added:
+  - XIII. Natural Language Interface (PHASE III REQUIREMENT)
+  - XIV. MCP Architecture (NON-NEGOTIABLE)
+  - XV. Stateless Chat Design (PHASE III REQUIREMENT)
+  - XVI. Conversation Persistence (PHASE III REQUIREMENT)
+  - XVII. Agent Tool Safety (NON-NEGOTIABLE)
+- Sections added:
+  - Phase III: AI-Powered Todo Chatbot
+  - Phase III Technical Stack
+  - Phase III Architecture Constraints
+  - Phase III MCP Tools Specification
+  - Phase III Database Extensions
+  - Phase III Success Criteria
+- Sections removed: None (cumulative)
 - Templates status:
-  ✅ plan-template.md: Aligned with Python 3.13+, CLI architecture, in-memory constraints
-  ✅ spec-template.md: Aligned with 5 basic features and user scenario requirements
-  ✅ tasks-template.md: Aligned with spec-driven workflow and TDD approach
+  ✅ plan-template.md: No update required (SDD workflow unchanged)
+  ✅ spec-template.md: No update required (feature spec pattern unchanged)
+  ✅ tasks-template.md: No update required (task structure unchanged)
 - Follow-up: None - all placeholders filled
 -->
 
@@ -838,36 +850,36 @@ specs/phase2/
 Phase II is complete when ALL criteria are met:
 
 #### Functional Requirements
-- [ ] User can register new account (Better Auth)
-- [ ] User can sign in with credentials
-- [ ] User can sign out
-- [ ] User can add new task (title required, description optional)
-- [ ] User can view their task list (filtered by user_id)
-- [ ] User can update task title and description
-- [ ] User can delete task with confirmation
-- [ ] User can mark task complete/incomplete
+- [x] User can register new account (Better Auth)
+- [x] User can sign in with credentials
+- [x] User can sign out
+- [x] User can add new task (title required, description optional)
+- [x] User can view their task list (filtered by user_id)
+- [x] User can update task title and description
+- [x] User can delete task with confirmation
+- [x] User can mark task complete/incomplete
 
 #### Technical Requirements
-- [ ] Frontend deployed to Vercel with public URL
-- [ ] Backend deployed with public API URL
-- [ ] Database persists data across server restarts
-- [ ] JWT authentication working end-to-end
-- [ ] Multi-user isolation verified (users see only their tasks)
-- [ ] CORS configured correctly
-- [ ] All environment variables properly configured
+- [x] Frontend deployed to Vercel with public URL
+- [x] Backend deployed with public API URL
+- [x] Database persists data across server restarts
+- [x] JWT authentication working end-to-end
+- [x] Multi-user isolation verified (users see only their tasks)
+- [x] CORS configured correctly
+- [x] All environment variables properly configured
 
 #### Quality Requirements
-- [ ] No application crashes on invalid input
-- [ ] Error messages clear and actionable
-- [ ] Loading states shown during API calls
-- [ ] Responsive design (works on mobile and desktop)
-- [ ] All code maps to approved specification tasks
-- [ ] Git repository with meaningful commit history
+- [x] No application crashes on invalid input
+- [x] Error messages clear and actionable
+- [x] Loading states shown during API calls
+- [x] Responsive design (works on mobile and desktop)
+- [x] All code maps to approved specification tasks
+- [x] Git repository with meaningful commit history
 
 #### Documentation Requirements
-- [ ] README.md with setup instructions
-- [ ] .env.example files for both frontend and backend
-- [ ] API documentation (endpoints, request/response formats)
+- [x] README.md with setup instructions
+- [x] .env.example files for both frontend and backend
+- [x] API documentation (endpoints, request/response formats)
 
 #### Demonstration
 - [ ] 90-second video demonstrating all features
@@ -952,3 +964,438 @@ All Phase I principles remain in effect unless explicitly superseded.
 Both phases follow Spec-Driven Development with Claude Code + Spec-Kit Plus.
 
 **Version**: 2.0.0 | **Ratified**: 2025-12-25 | **Phase II Added**: 2026-01-16
+
+---
+
+# Evolution of Todo - Phase III Constitution
+
+## Phase III: AI-Powered Todo Chatbot
+
+### 1. Evolution from Phase II
+
+- Phase I foundation: Console app with in-memory storage ✅
+- Phase II evolution: Web app with database persistence ✅
+- Phase III evolution: Add conversational AI interface for natural language task management
+
+### 2. Additional Core Principles (Phase III)
+
+#### XIII. Natural Language Interface (PHASE III REQUIREMENT)
+
+Users MUST be able to manage tasks through conversational natural language commands.
+The chatbot MUST understand intent and execute appropriate task operations.
+
+**Requirements**:
+- Understand commands like "Add buy groceries to my list"
+- Understand queries like "Show me pending tasks"
+- Understand actions like "Mark task 3 as complete"
+- Provide friendly, conversational responses confirming actions
+- Handle ambiguous requests with clarifying questions
+
+**Rationale**: Natural language interfaces lower the barrier to entry and provide a more
+intuitive user experience. Users can interact with tasks without learning specific commands.
+
+#### XIV. MCP Architecture (NON-NEGOTIABLE)
+
+All AI-task interactions MUST go through Model Context Protocol (MCP) tools.
+The MCP server MUST be stateless and expose task operations as discrete tools.
+
+**Requirements**:
+- MCP server implemented using official MCP SDK (Python)
+- Each task operation exposed as a separate MCP tool
+- Tools MUST validate user_id before executing operations
+- MCP server MUST NOT maintain conversation state (stateless)
+- Agent orchestrates tool calls based on user intent
+
+**Rationale**: MCP provides a standardized protocol for AI-tool interaction, enabling
+interoperability with various AI agents. Stateless design ensures scalability and reliability.
+
+#### XV. Stateless Chat Design (PHASE III REQUIREMENT)
+
+The chat endpoint MUST be stateless. All conversation context MUST be loaded from the
+database at the start of each request and NOT maintained in server memory.
+
+**Requirements**:
+- Chat endpoint: `POST /api/{user_id}/chat`
+- Load conversation history from database on each request
+- No server-side session storage for chat state
+- Conversation context passed to AI agent on each request
+
+**Rationale**: Stateless design enables horizontal scaling, fault tolerance, and
+consistent behavior across server restarts or load-balanced instances.
+
+#### XVI. Conversation Persistence (PHASE III REQUIREMENT)
+
+All conversations and messages MUST be persisted to the database. Conversation history
+MUST survive server restarts and be recoverable across sessions.
+
+**Requirements**:
+- `conversations` table: stores conversation metadata per user
+- `messages` table: stores individual messages with role and content
+- Messages linked to conversations via foreign key
+- Conversation history loadable for context window management
+
+**Rationale**: Persistence enables conversation continuity, user experience consistency,
+and potential future features like conversation search or analytics.
+
+#### XVII. Agent Tool Safety (NON-NEGOTIABLE)
+
+MCP tools MUST validate user authorization before executing any task operation.
+Tools MUST NOT allow cross-user data access under any circumstances.
+
+**Requirements**:
+- Every tool call MUST include and validate user_id
+- Tools MUST verify task ownership before modification/deletion
+- Failed authorization MUST return clear error (not silent failure)
+- Tools MUST NOT expose internal errors to the AI agent
+
+**Rationale**: Security is paramount. Even with AI intermediation, user data isolation
+MUST be maintained. The agent MUST NOT be able to bypass authorization checks.
+
+### 3. Technical Stack (Phase III)
+
+#### AI & Agent Stack
+
+| Component | Technology | Version | Purpose |
+|-----------|------------|---------|---------|
+| AI SDK | OpenAI Agents SDK | Latest | Agent orchestration and tool calling |
+| MCP Server | Official MCP SDK (Python) | Latest | Tool exposure via MCP protocol |
+| Chat UI | OpenAI ChatKit | Latest | Conversational interface component |
+
+#### Extended Backend Stack
+
+| Component | Technology | Version | Purpose |
+|-----------|------------|---------|---------|
+| Framework | FastAPI | 0.100+ | Existing + new chat endpoint |
+| AI Client | OpenAI Python SDK | Latest | Agent API calls |
+| MCP | MCP Python SDK | Latest | Tool server implementation |
+
+#### Database Extensions
+
+| Table | Purpose |
+|-------|---------|
+| conversations | Store conversation metadata |
+| messages | Store individual chat messages |
+
+### 4. Architecture Constraints (Phase III)
+
+#### Chat Endpoint Design
+
+**Endpoint**: `POST /api/{user_id}/chat`
+
+**Request**:
+```json
+{
+  "message": "Add buy groceries to my list",
+  "conversation_id": "uuid-optional"
+}
+```
+
+**Response**:
+```json
+{
+  "response": "I've added 'buy groceries' to your task list!",
+  "conversation_id": "uuid",
+  "actions_taken": [
+    {
+      "tool": "add_task",
+      "result": "success",
+      "task_id": "uuid"
+    }
+  ]
+}
+```
+
+#### MCP Server Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Phase III Architecture                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  User → ChatKit UI → POST /api/{user_id}/chat                  │
+│                              ↓                                  │
+│  FastAPI Chat Endpoint (JWT verified)                          │
+│                              ↓                                  │
+│  Load conversation history from DB                              │
+│                              ↓                                  │
+│  OpenAI Agent (with context + available tools)                 │
+│                              ↓                                  │
+│  Agent decides tool calls based on user intent                 │
+│                              ↓                                  │
+│  MCP Server executes tools (add_task, list_tasks, etc.)        │
+│                              ↓                                  │
+│  Tools interact with existing Task API/Database                │
+│                              ↓                                  │
+│  Agent formulates response                                     │
+│                              ↓                                  │
+│  Save message to DB, return response to user                   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### MCP Tools Specification
+
+The MCP server MUST expose these tools:
+
+| Tool Name | Purpose | Parameters |
+|-----------|---------|------------|
+| `add_task` | Create new task | `title: str`, `description: str?` |
+| `list_tasks` | Get user's tasks | `filter: "all" \| "pending" \| "completed"` |
+| `complete_task` | Mark task done | `task_id: str` |
+| `uncomplete_task` | Mark task pending | `task_id: str` |
+| `delete_task` | Remove task | `task_id: str` |
+| `update_task` | Modify task | `task_id: str`, `title: str?`, `description: str?` |
+| `get_task` | Get single task | `task_id: str` |
+
+**Tool Implementation Pattern**:
+```python
+@mcp_server.tool()
+async def add_task(
+    title: str,
+    description: str | None = None,
+    context: MCPContext
+) -> dict:
+    """Add a new task to the user's list."""
+    user_id = context.user_id  # Injected by MCP server
+
+    # Reuse existing task creation logic
+    task = await task_service.create_task(
+        user_id=user_id,
+        title=title,
+        description=description
+    )
+
+    return {
+        "success": True,
+        "task_id": str(task.id),
+        "message": f"Task '{title}' created successfully"
+    }
+```
+
+### 5. Database Extensions (Phase III)
+
+#### New Tables
+
+**Conversations Table**:
+```sql
+conversations (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title         VARCHAR(255),  -- Optional: auto-generated or user-set
+  created_at    TIMESTAMP DEFAULT NOW(),
+  updated_at    TIMESTAMP DEFAULT NOW()
+)
+
+CREATE INDEX idx_conversations_user_id ON conversations(user_id);
+```
+
+**Messages Table**:
+```sql
+messages (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  role            VARCHAR(50) NOT NULL,  -- 'user', 'assistant', 'system'
+  content         TEXT NOT NULL,
+  tool_calls      JSONB,  -- Optional: store tool calls made
+  created_at      TIMESTAMP DEFAULT NOW()
+)
+
+CREATE INDEX idx_messages_conversation_id ON messages(conversation_id);
+CREATE INDEX idx_messages_created_at ON messages(created_at);
+```
+
+#### SQLModel Implementation
+
+```python
+from sqlmodel import SQLModel, Field
+from datetime import datetime
+from uuid import UUID, uuid4
+from typing import Any
+
+class Conversation(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    user_id: UUID = Field(foreign_key="users.id", index=True)
+    title: str | None = Field(max_length=255, default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class Message(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    conversation_id: UUID = Field(foreign_key="conversations.id", index=True)
+    role: str = Field(max_length=50)  # 'user', 'assistant', 'system'
+    content: str
+    tool_calls: dict[str, Any] | None = Field(default=None, sa_type=JSONB)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+```
+
+### 6. Agent Behavior Requirements
+
+#### Intent Understanding
+
+The agent MUST understand these natural language patterns:
+
+| User Says | Intent | Tool Called |
+|-----------|--------|-------------|
+| "Add buy groceries" | Create task | `add_task` |
+| "Create a task to call mom" | Create task | `add_task` |
+| "Show my tasks" | List tasks | `list_tasks` |
+| "What's on my list?" | List tasks | `list_tasks` |
+| "Show pending tasks" | List filtered | `list_tasks(filter="pending")` |
+| "Mark task 3 as done" | Complete task | `complete_task` |
+| "I finished buying groceries" | Complete task | `complete_task` |
+| "Delete task 2" | Delete task | `delete_task` |
+| "Remove the groceries task" | Delete task | `delete_task` |
+| "Change task 1 title to..." | Update task | `update_task` |
+
+#### Response Style
+
+The agent MUST:
+- Confirm actions with friendly, natural language
+- Include relevant details (task title, ID) in confirmations
+- Handle errors gracefully with helpful messages
+- Ask for clarification when intent is ambiguous
+- Never expose technical errors to users
+
+**Example Responses**:
+- "I've added 'buy groceries' to your list!"
+- "You have 3 pending tasks: 1. Buy groceries, 2. Call mom, 3. Finish report"
+- "Done! I've marked 'buy groceries' as complete."
+- "I couldn't find a task matching 'groceries'. Did you mean task #2: 'Buy groceries'?"
+
+### 7. Security Requirements (Phase III - Additional)
+
+#### Chat Endpoint Security
+
+- Chat endpoint MUST require valid JWT (reuse Phase II auth)
+- user_id from URL MUST match JWT user_id (403 on mismatch)
+- Rate limiting RECOMMENDED to prevent abuse
+- Input sanitization for all user messages
+
+#### MCP Tool Security
+
+- Every tool MUST receive user_id from authenticated context
+- Tools MUST NOT accept user_id as a parameter (prevent spoofing)
+- Tools MUST validate task ownership before any operation
+- Tools MUST NOT return other users' data under any circumstances
+
+### 8. Frontend Integration (Phase III)
+
+#### ChatKit Component
+
+Add ChatKit UI component to the frontend:
+
+```typescript
+// /frontend/components/chat/ChatInterface.tsx
+'use client';
+
+import { ChatKit } from '@openai/chatkit';
+
+export function ChatInterface({ userId }: { userId: string }) {
+  const handleSendMessage = async (message: string) => {
+    const response = await fetch(`/api/${userId}/chat`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${getToken()}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message })
+    });
+
+    return response.json();
+  };
+
+  return (
+    <ChatKit
+      onSendMessage={handleSendMessage}
+      placeholder="Ask me to manage your tasks..."
+    />
+  );
+}
+```
+
+#### UI Integration
+
+- Chat interface accessible from main task view
+- Toggle between list view and chat view
+- Chat history persisted and visible
+- Both interfaces manage the same tasks
+
+### 9. Environment Variables (Phase III - Additional)
+
+**Backend** (`/backend/.env`):
+```env
+# Existing Phase II variables...
+
+# Phase III: AI Integration
+OPENAI_API_KEY=sk-...
+MCP_SERVER_URL=http://localhost:8001  # If separate process
+```
+
+### 10. Success Criteria (Phase III)
+
+Phase III is complete when ALL criteria are met:
+
+#### Functional Requirements
+- [ ] User can chat with AI to add tasks ("Add buy groceries")
+- [ ] User can ask AI to show tasks ("Show my pending tasks")
+- [ ] User can ask AI to complete tasks ("Mark task 3 as done")
+- [ ] User can ask AI to delete tasks ("Remove task 2")
+- [ ] User can ask AI to update tasks ("Change task 1 title to...")
+- [ ] Conversation history persists across sessions
+- [ ] Chat works alongside existing task UI (both functional)
+
+#### Technical Requirements
+- [ ] MCP server exposes all required tools
+- [ ] Chat endpoint is stateless (loads context from DB)
+- [ ] Conversation and messages stored in database
+- [ ] Agent correctly interprets natural language intents
+- [ ] All tools validate user_id authorization
+
+#### Quality Requirements
+- [ ] Agent responses are friendly and helpful
+- [ ] Errors handled gracefully with user-friendly messages
+- [ ] Ambiguous requests prompt clarification
+- [ ] No cross-user data leakage via chat
+- [ ] Chat performance acceptable (< 5s response time)
+
+#### Integration Requirements
+- [ ] All Phase II features still work
+- [ ] Same authentication for chat and REST API
+- [ ] Tasks created via chat visible in task list UI
+- [ ] Tasks created via UI manageable via chat
+
+### 11. Phase Transition Notes
+
+#### What Carries Forward from Phase II
+
+- ✅ Core Principles I-XII (all previous principles)
+- ✅ Full-stack web application (Next.js + FastAPI)
+- ✅ Database persistence (Neon PostgreSQL)
+- ✅ JWT authentication
+- ✅ Multi-user isolation
+- ✅ REST API for task CRUD
+- ✅ Deployment infrastructure (Vercel)
+
+#### What's NEW in Phase III
+
+- 🆕 Conversational AI interface (ChatKit)
+- 🆕 OpenAI Agent for intent understanding
+- 🆕 MCP server for tool execution
+- 🆕 Conversation persistence (new tables)
+- 🆕 Natural language task management
+
+#### Backward Compatibility
+
+Phase III MUST NOT break Phase II functionality:
+- REST API endpoints continue to work
+- Task list UI continues to work
+- Authentication unchanged
+- Database schema extended (not modified)
+
+---
+
+**IMPORTANT**: This constitution is cumulative. Phase III builds upon Phase I and II.
+All previous principles remain in effect unless explicitly superseded.
+All phases follow Spec-Driven Development with Claude Code + Spec-Kit Plus.
+
+**Version**: 3.0.0 | **Ratified**: 2025-12-25 | **Phase III Added**: 2026-01-22
