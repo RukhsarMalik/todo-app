@@ -53,3 +53,5 @@ htmlcov/
 
 # UV
 .uv/
+.vercel
+.env*.local

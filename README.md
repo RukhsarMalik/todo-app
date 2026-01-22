@@ -4,11 +4,9 @@ A complete full-stack task management application built with Next.js frontend an
 
 ## Live Demo
 
-- **Frontend**: [https://your-frontend.vercel.app](https://your-frontend.vercel.app)
-- **Backend API**: [https://your-backend.vercel.app](https://your-backend.vercel.app)
-- **Demo Video**: [Watch Demo](https://youtube.com/watch?v=...)
-
-> Update these URLs after deployment
+- **Frontend**: [https://frontend-ten-opal-98.vercel.app](https://frontend-ten-opal-98.vercel.app)
+- **Backend API**: [https://backend-lilac-two-78.vercel.app](https://backend-lilac-two-78.vercel.app)
+- **Demo Video**: [Watch Demo](https://youtube.com/watch?v=...) *(Add your video link)*
 
 ## Technology Stack
 
