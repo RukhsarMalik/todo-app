@@ -35,8 +35,21 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/{user_id}")
 
-# Initialize OpenAI client
-openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Lazy initialization of OpenAI client
+_openai_client = None
+
+def get_openai_client() -> AsyncOpenAI:
+    """Get or create OpenAI client with lazy initialization."""
+    global _openai_client
+    if _openai_client is None:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise HTTPException(
+                status_code=503,
+                detail="Chat service unavailable: OPENAI_API_KEY not configured"
+            )
+        _openai_client = AsyncOpenAI(api_key=api_key)
+    return _openai_client
 
 # Define the tools/functions that OpenAI can call
 TOOLS = [
@@ -382,7 +395,7 @@ async def chat(
         while iteration < max_iterations:
             iteration += 1
 
-            response = await openai_client.chat.completions.create(
+            response = await get_openai_client().chat.completions.create(
                 model="gpt-4o-mini",  # Using a more cost-effective model
                 messages=messages,
                 tools=TOOLS,
