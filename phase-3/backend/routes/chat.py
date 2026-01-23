@@ -25,6 +25,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from openai import AsyncOpenAI
 from sqlmodel import select
+import httpx
 
 from auth.middleware import get_current_user
 from db import get_session_context
@@ -48,7 +49,16 @@ def get_openai_client() -> AsyncOpenAI:
                 status_code=503,
                 detail="Chat service unavailable: OPENAI_API_KEY not configured"
             )
-        _openai_client = AsyncOpenAI(api_key=api_key)
+        # Configure httpx client with longer timeouts for Hugging Face
+        http_client = httpx.AsyncClient(
+            timeout=httpx.Timeout(60.0, connect=30.0),
+            limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
+        )
+        _openai_client = AsyncOpenAI(
+            api_key=api_key,
+            http_client=http_client,
+            max_retries=3
+        )
     return _openai_client
 
 # Define the tools/functions that OpenAI can call
