@@ -1,0 +1,116 @@
+{
+  "name": "todo-task-tools",
+  "version": "1.0.0",
+  "description": "MCP server exposing task management tools for AI agents",
+  "transport": "stdio",
+  "tools": [
+    {
+      "name": "add_task",
+      "description": "Create a new task for the user. Use this when the user wants to add something to their todo list.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The user's unique identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "The task title (required, max 200 characters)",
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional task description (max 1000 characters)",
+            "maxLength": 1000
+          }
+        },
+        "required": ["user_id", "title"]
+      }
+    },
+    {
+      "name": "list_tasks",
+      "description": "List user's tasks. Use this when the user wants to see their tasks, todo list, or asks what they have to do.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The user's unique identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["all", "pending", "completed"],
+            "description": "Filter by status: 'all' (default), 'pending' (incomplete), or 'completed'",
+            "default": "all"
+          }
+        },
+        "required": ["user_id"]
+      }
+    },
+    {
+      "name": "complete_task",
+      "description": "Mark a task as completed. Use this when the user says they finished a task, completed something, or wants to mark it done.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The user's unique identifier"
+          },
+          "task_id": {
+            "type": "integer",
+            "description": "The task ID to mark as completed"
+          }
+        },
+        "required": ["user_id", "task_id"]
+      }
+    },
+    {
+      "name": "delete_task",
+      "description": "Delete a task from the user's list. Use this when the user wants to remove a task entirely.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The user's unique identifier"
+          },
+          "task_id": {
+            "type": "integer",
+            "description": "The task ID to delete"
+          }
+        },
+        "required": ["user_id", "task_id"]
+      }
+    },
+    {
+      "name": "update_task",
+      "description": "Update a task's title or description. Use this when the user wants to change, edit, or modify an existing task.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The user's unique identifier"
+          },
+          "task_id": {
+            "type": "integer",
+            "description": "The task ID to update"
+          },
+          "title": {
+            "type": "string",
+            "description": "New task title (optional)",
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "description": "New task description (optional)",
+            "maxLength": 1000
+          }
+        },
+        "required": ["user_id", "task_id"]
+      }
+    }
+  ]
+}

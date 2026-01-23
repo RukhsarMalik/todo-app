@@ -214,8 +214,10 @@ See `.specify/memory/constitution.md` for code quality, testing, performance, se
 - In-memory (list of Task objects managed by TaskManager) (001-todo-console-app)
 - Python 3.12+ + FastAPI, Uvicorn, SQLModel (from Module 1), Pydantic (003-backend-api)
 - Neon PostgreSQL via SQLModel (from Module 1) (003-backend-api)
+- OpenAI Agents SDK + MCP SDK for AI chatbot functionality (006-chat-database)
 - TypeScript 5.x with Node.js 22+ (LTS) + Next.js 16+ (App Router), React 19, Tailwind CSS 4 (005-frontend-web-app)
 - N/A (consumes backend API; Neon PostgreSQL via FastAPI) (005-frontend-web-app)
 
 ## Recent Changes
+- 006-chat-database: Added OpenAI Agents SDK + MCP SDK for AI chatbot functionality
 - 001-todo-console-app: Added Python 3.13+ + Python standard library only (dataclasses, typing, datetime, sys, enum)
