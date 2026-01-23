@@ -1,19 +1,20 @@
 <!--
 Sync Impact Report:
-- Version: 2.0.0 → 3.0.0 (MAJOR: Added Phase III AI Chatbot with 5 new principles)
+- Version: 3.0.0 → 4.0.0 (MAJOR: Added Phase IV Cloud Native Deployment with 5 new principles)
 - Principles added:
-  - XIII. Natural Language Interface (PHASE III REQUIREMENT)
-  - XIV. MCP Architecture (NON-NEGOTIABLE)
-  - XV. Stateless Chat Design (PHASE III REQUIREMENT)
-  - XVI. Conversation Persistence (PHASE III REQUIREMENT)
-  - XVII. Agent Tool Safety (NON-NEGOTIABLE)
+  - XVIII. Container-First Architecture (PHASE IV REQUIREMENT)
+  - XIX. Kubernetes Orchestration (PHASE IV REQUIREMENT)
+  - XX. Helm Package Management (PHASE IV REQUIREMENT)
+  - XXI. AI-Assisted DevOps (PHASE IV ENHANCEMENT)
+  - XXII. Infrastructure as Code (NON-NEGOTIABLE)
 - Sections added:
-  - Phase III: AI-Powered Todo Chatbot
-  - Phase III Technical Stack
-  - Phase III Architecture Constraints
-  - Phase III MCP Tools Specification
-  - Phase III Database Extensions
-  - Phase III Success Criteria
+  - Phase IV: Cloud Native Deployment
+  - Phase IV Technical Stack
+  - Phase IV Architecture Constraints
+  - Phase IV Kubernetes Resources
+  - Phase IV Helm Charts Specification
+  - Phase IV AI DevOps Tools
+  - Phase IV Success Criteria
 - Sections removed: None (cumulative)
 - Templates status:
   ✅ plan-template.md: No update required (SDD workflow unchanged)
@@ -1398,4 +1399,359 @@ Phase III MUST NOT break Phase II functionality:
 All previous principles remain in effect unless explicitly superseded.
 All phases follow Spec-Driven Development with Claude Code + Spec-Kit Plus.
 
-**Version**: 3.0.0 | **Ratified**: 2025-12-25 | **Phase III Added**: 2026-01-22
+**Version**: 4.0.0 | **Ratified**: 2025-12-25 | **Phase III Added**: 2026-01-22 | **Phase IV Added**: 2026-01-23
+
+---
+
+# Evolution of Todo - Phase IV Constitution
+
+## Phase IV: Cloud Native Deployment
+
+### 1. Evolution from Phase III
+
+- Phase I foundation: Console app with in-memory storage ✅
+- Phase II evolution: Web app with database persistence ✅
+- Phase III evolution: AI-Powered Chatbot integration ✅
+- Phase IV evolution: Containerized + Kubernetes deployment on local cluster
+
+### 2. Additional Core Principles (Phase IV)
+
+#### XVIII. Container-First Architecture (PHASE IV REQUIREMENT)
+
+All application services MUST be containerized using Docker. Each service MUST have its own
+Dockerfile with multi-stage builds for optimized images.
+
+**Requirements**:
+- Backend service containerized (FastAPI)
+- Frontend service containerized (Next.js)
+- Multi-stage Docker builds for smaller images
+- Health checks defined in containers
+- Resource limits specified
+
+**Rationale**: Containers provide consistent environments across development, testing, and
+production. They enable portability and simplify deployment processes.
+
+#### XIX. Kubernetes Orchestration (PHASE IV REQUIREMENT)
+
+All services MUST be deployable to a Kubernetes cluster. Local development uses Minikube
+for cluster simulation.
+
+**Requirements**:
+- Kubernetes Deployments for each service
+- Services for networking (ClusterIP, NodePort, LoadBalancer)
+- ConfigMaps for non-sensitive configuration
+- Secrets for sensitive data (DATABASE_URL, API keys)
+- Resource requests and limits defined
+
+**Rationale**: Kubernetes provides industry-standard orchestration, enabling scaling,
+self-healing, and declarative infrastructure management.
+
+#### XX. Helm Package Management (PHASE IV REQUIREMENT)
+
+All Kubernetes resources MUST be packaged as Helm charts for templating and versioning.
+
+**Requirements**:
+- Separate Helm charts for backend and frontend
+- values.yaml for environment-specific configuration
+- Templates for all K8s resources (Deployment, Service, ConfigMap, Secret)
+- Chart.yaml with proper versioning
+
+**Rationale**: Helm provides package management for Kubernetes, enabling reusable,
+versionable, and configurable deployments.
+
+#### XXI. AI-Assisted DevOps (PHASE IV ENHANCEMENT)
+
+AI tools SHOULD be used to assist with Kubernetes operations and troubleshooting.
+
+**Recommended Tools**:
+- `kubectl-ai`: Natural language Kubernetes commands
+- `kagent`: Cluster analysis and optimization
+- `Gordon` (Docker AI): Docker command assistance (optional)
+
+**Rationale**: AI-assisted DevOps accelerates learning, reduces errors, and provides
+intelligent suggestions for cluster management.
+
+#### XXII. Infrastructure as Code (NON-NEGOTIABLE)
+
+All infrastructure MUST be defined declaratively in version-controlled files.
+No manual kubectl apply without corresponding YAML files in the repository.
+
+**Requirements**:
+- All K8s manifests stored in `/k8s/` directory
+- Helm charts stored in `/k8s/helm/`
+- No manual cluster modifications
+- Changes tracked in Git
+
+**Rationale**: Infrastructure as Code ensures reproducibility, auditability, and
+enables GitOps workflows for deployment management.
+
+### 3. Technical Stack (Phase IV)
+
+#### Container & Orchestration Stack
+
+| Component | Technology | Version | Purpose |
+|-----------|------------|---------|---------|
+| Containers | Docker | Latest | Container runtime |
+| Desktop | Docker Desktop | Latest | Local Docker environment |
+| Orchestration | Kubernetes | 1.28+ | Container orchestration |
+| Local Cluster | Minikube | Latest | Local K8s development |
+| Package Manager | Helm | 3.x | K8s package management |
+
+#### AI DevOps Tools
+
+| Tool | Purpose |
+|------|---------|
+| kubectl-ai | Natural language K8s commands |
+| kagent | Cluster analysis and optimization |
+| Gordon | Docker AI assistant (optional) |
+
+#### Preserved Stack (from Phase III)
+
+| Component | Technology | Notes |
+|-----------|------------|-------|
+| Backend | FastAPI | Containerized |
+| Frontend | Next.js | Containerized |
+| Database | Neon PostgreSQL | External (NOT containerized) |
+| AI | OpenAI Agents SDK | Unchanged |
+
+### 4. Architecture Constraints (Phase IV)
+
+#### File Structure (REQUIRED)
+
+```
+phase-3/ (or phase-4/)
+├── backend/
+│   ├── Dockerfile              # Multi-stage build
+│   ├── main.py
+│   └── ... (existing backend files)
+├── frontend/
+│   ├── Dockerfile              # Multi-stage build
+│   ├── package.json
+│   └── ... (existing frontend files)
+└── k8s/
+    ├── helm/
+    │   ├── backend/
+    │   │   ├── Chart.yaml
+    │   │   ├── values.yaml
+    │   │   └── templates/
+    │   │       ├── deployment.yaml
+    │   │       ├── service.yaml
+    │   │       ├── configmap.yaml
+    │   │       └── secret.yaml
+    │   └── frontend/
+    │       ├── Chart.yaml
+    │       ├── values.yaml
+    │       └── templates/
+    │           ├── deployment.yaml
+    │           ├── service.yaml
+    │           └── configmap.yaml
+    └── manifests/              # Raw K8s manifests (optional)
+        ├── namespace.yaml
+        └── ingress.yaml
+```
+
+#### Dockerfile Standards
+
+**Backend Dockerfile**:
+```dockerfile
+# Build stage
+FROM python:3.12-slim as builder
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Production stage
+FROM python:3.12-slim
+WORKDIR /app
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY . .
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost:8000/health || exit 1
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+**Frontend Dockerfile**:
+```dockerfile
+# Build stage
+FROM node:22-alpine as builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM node:22-alpine
+WORKDIR /app
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+EXPOSE 3000
+CMD ["node", "server.js"]
+```
+
+### 5. Kubernetes Resources (Phase IV)
+
+#### Deployments
+
+Each service requires a Deployment with:
+- Replica count (default: 1 for local)
+- Container image reference
+- Environment variables from ConfigMaps/Secrets
+- Resource requests and limits
+- Liveness and readiness probes
+
+#### Services
+
+| Service | Type | Purpose |
+|---------|------|---------|
+| backend | ClusterIP | Internal backend access |
+| frontend | NodePort/LoadBalancer | External frontend access |
+
+#### ConfigMaps
+
+Non-sensitive configuration:
+- `FRONTEND_URL`
+- `API_BASE_PATH`
+- Feature flags
+
+#### Secrets
+
+Sensitive data (base64 encoded):
+- `DATABASE_URL`
+- `JWT_SECRET_KEY`
+- `OPENAI_API_KEY`
+
+### 6. Helm Charts Specification
+
+#### Chart.yaml Structure
+
+```yaml
+apiVersion: v2
+name: todo-backend
+description: Todo App Backend Service
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+```
+
+#### values.yaml Pattern
+
+```yaml
+replicaCount: 1
+
+image:
+  repository: todo-backend
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+env:
+  DATABASE_URL: ""  # Set via --set or secrets
+```
+
+### 7. AI DevOps Tools Usage
+
+#### kubectl-ai Examples
+
+```bash
+# Natural language K8s commands
+kubectl-ai "show all pods in todo namespace"
+kubectl-ai "scale backend deployment to 3 replicas"
+kubectl-ai "get logs from backend pod"
+kubectl-ai "describe why pod is failing"
+```
+
+#### kagent Examples
+
+```bash
+# Cluster analysis
+kagent analyze cluster
+kagent optimize resources
+kagent troubleshoot pod backend-xxx
+```
+
+### 8. Success Criteria (Phase IV)
+
+Phase IV is complete when ALL criteria are met:
+
+#### Containerization Requirements
+- [ ] Backend Dockerfile builds successfully
+- [ ] Frontend Dockerfile builds successfully
+- [ ] Images are optimized (multi-stage builds)
+- [ ] Health checks work in containers
+- [ ] Containers run locally with `docker run`
+
+#### Kubernetes Requirements
+- [ ] Minikube cluster running
+- [ ] Backend deployment successful
+- [ ] Frontend deployment successful
+- [ ] Services expose applications correctly
+- [ ] ConfigMaps and Secrets configured
+- [ ] App accessible via localhost (NodePort or port-forward)
+
+#### Helm Requirements
+- [ ] Backend Helm chart installs successfully
+- [ ] Frontend Helm chart installs successfully
+- [ ] `helm install` creates all resources
+- [ ] `helm uninstall` cleans up all resources
+- [ ] values.yaml customization works
+
+#### AI DevOps Requirements
+- [ ] kubectl-ai installed and functional
+- [ ] Can execute natural language K8s commands
+- [ ] kagent provides cluster insights (optional)
+
+#### Integration Requirements
+- [ ] All Phase III features still work
+- [ ] Chat endpoint functional in K8s
+- [ ] Task CRUD operations work
+- [ ] Authentication works
+- [ ] Database connection (external Neon) works
+
+### 9. Phase Transition Notes
+
+#### What Carries Forward from Phase III
+
+- ✅ Core Principles I-XVII (all previous principles)
+- ✅ Full-stack web application (Next.js + FastAPI)
+- ✅ Database persistence (Neon PostgreSQL - external)
+- ✅ JWT authentication
+- ✅ AI Chatbot (OpenAI Agents + MCP)
+- ✅ Conversation persistence
+
+#### What's NEW in Phase IV
+
+- 🆕 Docker containerization for all services
+- 🆕 Kubernetes orchestration (Minikube)
+- 🆕 Helm charts for package management
+- 🆕 AI-assisted DevOps tools
+- 🆕 Infrastructure as Code practices
+
+#### Backward Compatibility
+
+Phase IV MUST NOT break Phase III functionality:
+- All API endpoints continue to work
+- Chat interface continues to work
+- Task management unchanged
+- Authentication unchanged
+- Database NOT containerized (keeps Neon external)
+
+---
+
+**IMPORTANT**: This constitution is cumulative. Phase IV builds upon Phase I, II, and III.
+All previous principles remain in effect unless explicitly superseded.
+All phases follow Spec-Driven Development with Claude Code + Spec-Kit Plus.
+
+**Version**: 4.0.0 | **Ratified**: 2025-12-25 | **Phase IV Added**: 2026-01-23
