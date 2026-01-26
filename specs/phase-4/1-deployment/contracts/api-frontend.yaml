@@ -1,0 +1,50 @@
+# API Contract: Todo Application Frontend Service
+
+## Overview
+This document defines the API contract for the frontend service in the containerized Todo application. The frontend is a Next.js application that provides the user interface and communicates with the backend API.
+
+## Service Information
+- **Service Name**: todo-frontend
+- **Protocol**: HTTP/HTTPS
+- **Container Port**: 3000
+- **External Access**: NodePort or LoadBalancer service
+
+## Environment Variables
+The frontend service expects the following environment variables to be configured:
+
+### Required Variables
+- `NEXT_PUBLIC_API_URL`: Base URL for the backend API service
+
+### Optional Variables
+- `NEXT_PUBLIC_APP_NAME`: Name of the application (default: "Todo App")
+
+## API Endpoints (Consumed by Frontend)
+
+### Backend API Endpoints
+The frontend consumes all the endpoints defined in the backend API contract, including:
+- Task management: `/api/tasks` (GET, POST, PUT, DELETE, PATCH)
+- Authentication: `/api/auth/*` (via Better Auth)
+- Chat: `/api/{user_id}/chat` (POST)
+- Health check: `/health` (GET)
+
+## Kubernetes Service Configuration
+- **Service Type**: NodePort or LoadBalancer
+- **Port**: 80 (external), targets container port 3000
+- **Health Probes**:
+  - Liveness: HTTP GET / every 30s after 30s delay
+  - Readiness: HTTP GET / every 5s after 5s delay
+
+## Configuration Requirements
+- **Static Assets**: All static assets (JS, CSS, images) served from container
+- **SSR/SSG**: Next.js static generation or server-side rendering
+- **API Proxy**: Ability to proxy API requests to backend service if needed
+
+## Security Requirements
+- HTTPS termination at load balancer (if using LoadBalancer)
+- CORS configured to allow requests to backend service
+- Environment variables for API URL managed via ConfigMap
+
+## Build Configuration
+- **Build Target**: Standalone output for containerization
+- **Runtime**: Node.js 20+ in production container
+- **Static Assets**: Pre-built during Docker build process

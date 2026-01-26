@@ -1,0 +1,253 @@
+# API Contract: Todo Application Backend Service
+
+## Overview
+This document defines the API contract for the backend service in the containerized Todo application. The backend is a FastAPI application that provides RESTful endpoints for managing tasks and conversations.
+
+## Service Information
+- **Service Name**: todo-backend
+- **Protocol**: HTTP/HTTPS
+- **Base Path**: `/api`
+- **Container Port**: 8000
+- **Health Check Endpoint**: `/health`
+
+## Environment Variables
+The backend service expects the following environment variables to be configured:
+
+### Required Variables
+- `DATABASE_URL`: Connection string for Neon PostgreSQL database
+- `BETTER_AUTH_SECRET`: JWT signing secret for authentication
+
+### Optional Variables
+- `FRONTEND_URL`: URL of the frontend service for CORS configuration
+- `LOG_LEVEL`: Logging level (default: INFO)
+
+## API Endpoints
+
+### Health Check
+```
+GET /health
+```
+**Description**: Health check endpoint for Kubernetes liveness/readiness probes
+**Response**:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-01-25T12:00:00Z"
+}
+```
+
+### Task Management Endpoints
+
+#### List Tasks
+```
+GET /api/tasks
+Headers:
+  Authorization: Bearer {jwt_token}
+```
+**Description**: Retrieve all tasks for the authenticated user
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid-string",
+      "title": "Task title",
+      "description": "Task description or null",
+      "is_completed": false,
+      "created_at": "2026-01-25T12:00:00Z",
+      "updated_at": "2026-01-25T12:00:00Z"
+    }
+  ]
+}
+```
+
+#### Create Task
+```
+POST /api/tasks
+Headers:
+  Authorization: Bearer {jwt_token}
+  Content-Type: application/json
+Body:
+{
+  "title": "Task title",
+  "description": "Task description (optional)"
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid-string",
+    "title": "Task title",
+    "description": "Task description or null",
+    "is_completed": false,
+    "created_at": "2026-01-25T12:00:00Z",
+    "updated_at": "2026-01-25T12:00:00Z"
+  }
+}
+```
+
+#### Get Single Task
+```
+GET /api/tasks/{task_id}
+Headers:
+  Authorization: Bearer {jwt_token}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid-string",
+    "title": "Task title",
+    "description": "Task description or null",
+    "is_completed": false,
+    "created_at": "2026-01-25T12:00:00Z",
+    "updated_at": "2026-01-25T12:00:00Z"
+  }
+}
+```
+
+#### Update Task
+```
+PUT /api/tasks/{task_id}
+Headers:
+  Authorization: Bearer {jwt_token}
+  Content-Type: application/json
+Body:
+{
+  "title": "Updated title",
+  "description": "Updated description (optional)",
+  "is_completed": false
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid-string",
+    "title": "Updated title",
+    "description": "Updated description or null",
+    "is_completed": false,
+    "created_at": "2026-01-25T12:00:00Z",
+    "updated_at": "2026-01-25T12:00:00Z"
+  }
+}
+```
+
+#### Delete Task
+```
+DELETE /api/tasks/{task_id}
+Headers:
+  Authorization: Bearer {jwt_token}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Task deleted successfully"
+  }
+}
+```
+
+#### Toggle Task Status
+```
+PATCH /api/tasks/{task_id}/toggle
+Headers:
+  Authorization: Bearer {jwt_token}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid-string",
+    "title": "Task title",
+    "description": "Task description or null",
+    "is_completed": true,
+    "created_at": "2026-01-25T12:00:00Z",
+    "updated_at": "2026-01-25T12:00:00Z"
+  }
+}
+```
+
+### Conversation Management Endpoints
+
+#### Create Conversation
+```
+POST /api/conversations
+Headers:
+  Authorization: Bearer {jwt_token}
+  Content-Type: application/json
+Body:
+{
+  "title": "Conversation title (optional)"
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid-string",
+    "title": "Conversation title or null",
+    "created_at": "2026-01-25T12:00:00Z",
+    "updated_at": "2026-01-25T12:00:00Z"
+  }
+}
+```
+
+#### Chat Endpoint
+```
+POST /api/{user_id}/chat
+Headers:
+  Authorization: Bearer {jwt_token}
+  Content-Type: application/json
+Body:
+{
+  "message": "User message to AI",
+  "conversation_id": "uuid-string (optional)"
+}
+```
+**Response**:
+```json
+{
+  "response": "AI response to user",
+  "conversation_id": "uuid-string",
+  "actions_taken": [
+    {
+      "tool": "add_task",
+      "result": "success",
+      "task_id": "uuid-string"
+    }
+  ]
+}
+```
+
+## Error Responses
+All error responses follow this format:
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error message"
+  }
+}
+```
+
+## Kubernetes Service Configuration
+- **Service Type**: ClusterIP
+- **Port**: 80 (internal), targets container port 8000
+- **Health Probes**:
+  - Liveness: GET /health every 30s after 30s delay
+  - Readiness: GET /health every 5s after 5s delay
+
+## Security Requirements
+- All endpoints (except health check) require valid JWT in Authorization header
+- Database credentials stored in Kubernetes Secret
+- Environment variables for sensitive data managed via ConfigMap/Secret
