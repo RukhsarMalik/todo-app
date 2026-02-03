@@ -1,0 +1,57 @@
+# Dapr Pub/Sub Component - Kafka Backend
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub
+  namespace: default
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+    - name: brokers
+      value: "todo-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092"
+    - name: consumerGroup
+      value: "todo-app"
+    - name: authType
+      value: "none"
+---
+# Dapr Secret Store - Kubernetes Secrets
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kubernetes-secrets
+  namespace: default
+spec:
+  type: secretstores.kubernetes
+  version: v1
+  metadata: []
+---
+# Dapr Subscription - Notification Service
+apiVersion: dapr.io/v2alpha1
+kind: Subscription
+metadata:
+  name: notification-sub
+  namespace: default
+spec:
+  topic: reminders
+  routes:
+    default: /events/reminder
+  pubsubname: pubsub
+scopes:
+  - notification-service
+---
+# Dapr Subscription - Recurring Task Service
+apiVersion: dapr.io/v2alpha1
+kind: Subscription
+metadata:
+  name: recurring-task-sub
+  namespace: default
+spec:
+  topic: task-events
+  routes:
+    rules:
+      - match: event.type == "task.completed"
+        path: /events/task-completed
+  pubsubname: pubsub
+scopes:
+  - recurring-task-service

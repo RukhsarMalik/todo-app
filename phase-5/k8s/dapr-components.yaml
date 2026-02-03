@@ -1,0 +1,31 @@
+# =============================================================================
+# Phase V: Dapr Components for Event-Driven Architecture
+# Requires Dapr installed: dapr init -k
+# =============================================================================
+
+# Pub/Sub component backed by Strimzi Kafka
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+    - name: brokers
+      value: "todo-kafka-kafka-bootstrap:9092"
+    - name: consumerGroup
+      value: "todo-app"
+    - name: authRequired
+      value: "false"
+
+---
+# Secrets component backed by Kubernetes Secrets
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kubernetes-secrets
+spec:
+  type: secretstores.kubernetes
+  version: v1
+  metadata: []

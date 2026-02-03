@@ -1,0 +1,14 @@
+# =============================================================================
+# ConfigMap Template
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+  labels:
+    app: todo-app
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+data:
+  frontend_url: {{ .Values.config.frontendUrl | quote }}
+  backend_url: "http://{{ .Release.Name }}-backend:{{ .Values.backend.service.port }}"

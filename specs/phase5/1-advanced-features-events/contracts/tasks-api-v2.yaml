@@ -1,0 +1,161 @@
+openapi: "3.0.3"
+info:
+  title: "Tasks API v2 - Advanced Features"
+  version: "2.0.0"
+  description: "Extended task endpoints with priority, due dates, tags, search, filter, sort"
+
+paths:
+  /api/{user_id}/tasks:
+    get:
+      summary: "List/Search/Filter/Sort tasks"
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: search
+          in: query
+          description: "Keyword search across title and description (case-insensitive partial match)"
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { type: string, enum: [all, pending, completed], default: all }
+        - name: priority
+          in: query
+          schema: { type: string, enum: [low, medium, high, urgent] }
+        - name: tags
+          in: query
+          description: "Comma-separated tag names"
+          schema: { type: string }
+        - name: due_date_from
+          in: query
+          schema: { type: string, format: date-time }
+        - name: due_date_to
+          in: query
+          schema: { type: string, format: date-time }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [created_at, due_date, priority, title], default: created_at }
+        - name: order
+          in: query
+          schema: { type: string, enum: [asc, desc], default: desc }
+      responses:
+        "200":
+          description: "List of tasks"
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TaskResponse" }
+    post:
+      summary: "Create task with advanced fields"
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TaskCreate" }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TaskResponse" }
+
+  /api/{user_id}/tags:
+    get:
+      summary: "List user's tags"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TagResponse" }
+    post:
+      summary: "Create tag"
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TagCreate" }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TagResponse" }
+
+  /api/{user_id}/tags/{tag_id}:
+    delete:
+      summary: "Delete tag (cascades to task_tags)"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MessageResponse" }
+
+  /api/{user_id}/notifications:
+    get:
+      summary: "List user's notifications"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/NotificationResponse" }
+
+components:
+  schemas:
+    TaskCreate:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        description: { type: string, maxLength: 1000 }
+        priority: { type: string, enum: [low, medium, high, urgent], default: medium }
+        due_date: { type: string, format: date-time, nullable: true }
+        reminder_offset: { type: integer, minimum: 0, default: 60 }
+        recurrence_rule: { type: object, nullable: true }
+        tag_ids: { type: array, items: { type: integer } }
+
+    TaskResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        user_id: { type: string }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        completed: { type: boolean }
+        priority: { type: string }
+        due_date: { type: string, format: date-time, nullable: true }
+        reminder_offset: { type: integer }
+        recurrence_rule: { type: object, nullable: true }
+        next_occurrence: { type: string, format: date-time, nullable: true }
+        parent_task_id: { type: integer, nullable: true }
+        tags: { type: array, items: { $ref: "#/components/schemas/TagResponse" } }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    TagCreate:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+
+    TagResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        created_at: { type: string, format: date-time }
+
+    NotificationResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        task_id: { type: integer, nullable: true }
+        message: { type: string }
+        read: { type: boolean }
+        created_at: { type: string, format: date-time }
+
+    MessageResponse:
+      type: object
+      properties:
+        message: { type: string }

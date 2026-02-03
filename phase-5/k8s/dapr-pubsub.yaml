@@ -1,0 +1,49 @@
+# Pub/Sub Component: Redpanda Cloud (Kafka-compatible)
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-pubsub
+  namespace: todo
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+    # Redpanda Cloud bootstrap server
+    - name: brokers
+      secretKeyRef:
+        name: kafka-secrets
+        key: bootstrap-servers
+
+    # SASL Authentication (required for Redpanda Cloud)
+    - name: authType
+      value: "password"
+    - name: saslMechanism
+      value: "SCRAM-SHA-256"
+    - name: saslUsername
+      secretKeyRef:
+        name: kafka-secrets
+        key: username
+    - name: saslPassword
+      secretKeyRef:
+        name: kafka-secrets
+        key: password
+
+    # TLS Configuration (Redpanda Cloud uses TLS)
+    - name: disableTls
+      value: "false"
+
+    # Consumer Configuration
+    - name: consumerGroup
+      value: "todo-group"
+    - name: initialOffset
+      value: "oldest"
+
+    # Producer Configuration
+    - name: maxMessageBytes
+      value: "1048576"  # 1MB
+
+  # Scopes: which app IDs can use this component
+  scopes:
+    - backend
+    - notification-service
+    - recurring-service

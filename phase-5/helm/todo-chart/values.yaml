@@ -1,0 +1,137 @@
+# =============================================================================
+# Phase V: Helm Chart Values - Event-Driven Architecture
+# =============================================================================
+
+# Backend Configuration
+backend:
+  replicaCount: 2
+  image:
+    repository: todo-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  livenessProbe:
+    path: /health
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readinessProbe:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  dapr:
+    enabled: true
+    appId: backend
+    appPort: 8000
+
+# Frontend Configuration
+frontend:
+  replicaCount: 2
+  image:
+    repository: todo-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 80
+    targetPort: 3000
+    nodePort: 30000
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  livenessProbe:
+    path: /
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readinessProbe:
+    path: /
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Notification Service (Phase V)
+notification:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: todo-notification
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 8001
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  dapr:
+    enabled: true
+    appId: notification-service
+    appPort: 8001
+
+# Recurring Task Service (Phase V)
+recurringTask:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: todo-recurring-task
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 8002
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  dapr:
+    enabled: true
+    appId: recurring-task-service
+    appPort: 8002
+
+# Secrets
+secrets:
+  databaseUrl: "postgresql://user:password@host:5432/dbname"
+  jwtSecretKey: "your-super-secret-jwt-key-min-32-chars"
+  openaiApiKey: "sk-your-openai-api-key"
+
+# ConfigMap
+config:
+  frontendUrl: "http://localhost:30000"
+  backendUrl: "http://{{ .Release.Name }}-backend:80"
+
+# Kafka (Strimzi)
+kafka:
+  enabled: true
+  clusterName: todo-kafka
+
+# Common
+nameOverride: ""
+fullnameOverride: ""
+nodeSelector: {}
+tolerations: []
+affinity: {}

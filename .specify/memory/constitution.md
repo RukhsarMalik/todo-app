@@ -1,20 +1,17 @@
 c<!--
 Sync Impact Report:
-- Version: 3.0.0 → 4.0.0 (MAJOR: Added Phase IV Cloud Native Deployment with 5 new principles)
+- Version: 4.0.0 → 5.0.0 (MAJOR: Added Phase V Advanced Cloud Deployment with 5 new principles)
 - Principles added:
-  - XVIII. Container-First Architecture (PHASE IV REQUIREMENT)
-  - XIX. Kubernetes Orchestration (PHASE IV REQUIREMENT)
-  - XX. Helm Package Management (PHASE IV REQUIREMENT)
-  - XXI. AI-Assisted DevOps (PHASE IV ENHANCEMENT)
-  - XXII. Infrastructure as Code (NON-NEGOTIABLE)
+  - XXIII. Event-Driven Architecture (PHASE V REQUIREMENT)
+  - XXIV. Distributed Runtime (PHASE V REQUIREMENT)
+  - XXV. Cloud-Native Production Deployment (PHASE V REQUIREMENT)
+  - XXVI. CI/CD Automation (NON-NEGOTIABLE)
+  - XXVII. Advanced Task Features (PHASE V REQUIREMENT)
 - Sections added:
-  - Phase IV: Cloud Native Deployment
-  - Phase IV Technical Stack
-  - Phase IV Architecture Constraints
-  - Phase IV Kubernetes Resources
-  - Phase IV Helm Charts Specification
-  - Phase IV AI DevOps Tools
-  - Phase IV Success Criteria
+  - Phase V: Advanced Cloud Deployment
+  - Phase V Technical Stack
+  - Phase V Module Structure
+  - Phase V Success Criteria
 - Sections removed: None (cumulative)
 - Templates status:
   ✅ plan-template.md: No update required (SDD workflow unchanged)
@@ -1754,4 +1751,279 @@ Phase IV MUST NOT break Phase III functionality:
 All previous principles remain in effect unless explicitly superseded.
 All phases follow Spec-Driven Development with Claude Code + Spec-Kit Plus.
 
-**Version**: 4.0.0 | **Ratified**: 2025-12-25 | **Phase IV Added**: 2026-01-23
+**Version**: 5.0.0 | **Ratified**: 2025-12-25 | **Phase IV Added**: 2026-01-23 | **Phase V Added**: 2026-02-02
+
+---
+
+# Evolution of Todo - Phase V Constitution
+
+## Phase V: Advanced Cloud Deployment
+
+### 1. Evolution from Phase IV
+
+- Phase I foundation: Console app with in-memory storage ✅
+- Phase II evolution: Web app with database persistence ✅
+- Phase III evolution: AI-Powered Chatbot integration ✅
+- Phase IV evolution: Containerized + Kubernetes local deployment ✅
+- Phase V evolution: Advanced features + Event-driven architecture + Cloud production
+
+### 2. Additional Core Principles (Phase V)
+
+#### XXIII. Event-Driven Architecture (PHASE V REQUIREMENT)
+
+All inter-service communication MUST use event-driven patterns via Apache Kafka.
+Services MUST publish domain events for state changes and consume events asynchronously.
+
+**Requirements**:
+- Kafka (Strimzi operator) for local development on Minikube
+- Redpanda or Confluent Cloud for production deployment
+- Task events published on state changes (created, updated, completed, deleted)
+- Reminder events for scheduled notifications
+- At-least-once delivery semantics with idempotent consumers
+
+**Rationale**: Event-driven architecture decouples services, enables asynchronous processing,
+and provides a foundation for scalable microservice communication.
+
+#### XXIV. Distributed Runtime (PHASE V REQUIREMENT)
+
+All services MUST use Dapr (Distributed Application Runtime) for infrastructure abstraction.
+Dapr building blocks MUST be used instead of direct SDK calls for cross-cutting concerns.
+
+**Requirements**:
+- Dapr Pub/Sub for event publishing and subscription (Kafka backend)
+- Dapr State Store for distributed state management
+- Dapr Jobs API for scheduled tasks (recurring tasks, reminders)
+- Dapr Secrets API for secret management
+- Dapr sidecars deployed alongside each service
+
+**Rationale**: Dapr abstracts infrastructure concerns, enabling portability across environments
+(local, cloud) without code changes. Services interact with Dapr APIs, not directly with
+Kafka, Redis, or secret stores.
+
+#### XXV. Cloud-Native Production Deployment (PHASE V REQUIREMENT)
+
+The application MUST be deployable to at least one managed Kubernetes service
+(GKE, AKS, or OKE) with production-grade configuration.
+
+**Requirements**:
+- Managed Kubernetes cluster (GKE, AKS, or OKE)
+- External Kafka service (Redpanda Cloud or Confluent Cloud)
+- Dapr configured for cloud environment
+- TLS/HTTPS for all external endpoints
+- Proper namespace isolation
+
+**Rationale**: Cloud deployment validates that the architecture works in a real production
+environment, not just local development. Managed K8s reduces operational burden.
+
+#### XXVI. CI/CD Automation (NON-NEGOTIABLE)
+
+All deployments MUST be automated through CI/CD pipelines. No manual deployment
+steps permitted in production workflows.
+
+**Requirements**:
+- GitHub Actions for CI/CD pipelines
+- Automated Docker image builds on push
+- Automated testing before deployment
+- Automated deployment to cloud cluster
+- Rollback capability
+
+**Rationale**: CI/CD automation ensures consistent, repeatable deployments and reduces
+human error. Every change goes through the same verified pipeline.
+
+#### XXVII. Advanced Task Features (PHASE V REQUIREMENT)
+
+The task model MUST be extended with advanced features to support real-world
+productivity use cases.
+
+**Requirements**:
+- Due dates with reminder scheduling
+- Priority levels (low, medium, high, urgent)
+- Tags/labels for categorization
+- Recurrence rules (daily, weekly, monthly, custom)
+- Search, filter, and sort across all task fields
+
+**Rationale**: Advanced features transform the todo app from a learning exercise into a
+functional productivity tool, while exercising the event-driven and microservice patterns.
+
+### 3. Technical Stack (Phase V)
+
+#### Event & Runtime Stack
+
+| Component | Technology | Version | Purpose |
+|-----------|------------|---------|---------|
+| Events (Local) | Apache Kafka (Strimzi) | Latest | Local event streaming |
+| Events (Cloud) | Redpanda/Confluent Cloud | Latest | Cloud event streaming |
+| Runtime | Dapr | 1.12+ | Distributed application runtime |
+| Dapr Pub/Sub | Kafka component | Latest | Event pub/sub via Dapr |
+| Dapr State | Redis/Cloud store | Latest | Distributed state |
+| Dapr Jobs | Jobs API | Latest | Scheduled tasks |
+| Dapr Secrets | Secret store | Latest | Secret management |
+
+#### CI/CD Stack
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| CI/CD | GitHub Actions | Pipeline automation |
+| Registry | GitHub Container Registry | Docker image storage |
+| Cloud K8s | GKE/AKS/OKE | Production cluster |
+
+#### Preserved Stack (from Phase IV)
+
+| Component | Technology | Notes |
+|-----------|------------|-------|
+| Backend | FastAPI | Extended with new endpoints |
+| Frontend | Next.js | Extended with new UI features |
+| Database | Neon PostgreSQL | Schema extended |
+| AI | OpenAI Agents SDK | Unchanged |
+| Containers | Docker | Unchanged |
+| Orchestration | Kubernetes | Cloud instead of local-only |
+| Package Mgr | Helm | Charts extended |
+
+### 4. Module Structure (Phase V)
+
+#### Module 1: Advanced Features + Event Architecture (Local)
+
+**Database Extensions**:
+- Add `due_date` (TIMESTAMP, nullable) to tasks table
+- Add `priority` (ENUM: low, medium, high, urgent) to tasks table
+- Add `tags` (TEXT[] or JSONB) to tasks table
+- Add `recurrence_rule` (VARCHAR, nullable) to tasks table
+- Add `next_occurrence` (TIMESTAMP, nullable) to tasks table
+
+**Backend Extensions**:
+- Search endpoint: `GET /api/tasks/search?q=...`
+- Filter endpoint: `GET /api/tasks?priority=high&tags=work`
+- Sort endpoint: `GET /api/tasks?sort=due_date&order=asc`
+- Reminder management endpoints
+
+**Kafka Integration**:
+- Task events: `task.created`, `task.updated`, `task.completed`, `task.deleted`
+- Reminder events: `reminder.scheduled`, `reminder.triggered`
+- Strimzi operator for Kafka on Minikube
+
+**New Microservices**:
+- Notification service: consumes reminder events, sends notifications
+- Recurring task service: processes recurrence rules, creates new task instances
+
+**Dapr Integration**:
+- Pub/Sub building block (Kafka backend)
+- State store building block (Redis)
+- Jobs API for recurring task scheduling
+- Secrets building block for all sensitive config
+- All services deployed with Dapr sidecars on Minikube
+
+#### Module 2: Cloud Deployment + Production
+
+**Cloud Kubernetes**:
+- Deploy to GKE, AKS, or OKE (managed K8s)
+- Helm charts updated for cloud configuration
+- Ingress controller for external access
+
+**Cloud Kafka**:
+- Migrate from Strimzi to Redpanda Cloud or Confluent Cloud
+- Dapr Pub/Sub component reconfigured for cloud broker
+
+**Cloud Dapr**:
+- Dapr configuration adapted for cloud environment
+- Cloud-native secret stores (GCP Secret Manager, Azure Key Vault, OCI Vault)
+- Cloud state stores as needed
+
+**CI/CD Pipeline**:
+- GitHub Actions workflow for build, test, deploy
+- Docker image builds pushed to GitHub Container Registry
+- Automated deployment to cloud K8s cluster
+- Environment-specific configurations (dev, staging, prod)
+
+**Monitoring**:
+- Basic logging (stdout/stderr captured by K8s)
+- Health check endpoints for all services
+- Dapr observability (metrics, traces)
+
+### 5. Success Criteria (Phase V)
+
+Phase V is complete when ALL criteria are met:
+
+#### Advanced Features Requirements
+- [ ] Tasks support due dates with date picker UI
+- [ ] Tasks support priority levels (low, medium, high, urgent)
+- [ ] Tasks support tags/labels
+- [ ] Recurring tasks auto-create new instances
+- [ ] Search works across title, description, tags
+- [ ] Filter by priority, status, tags, due date
+- [ ] Sort by due date, priority, created date
+
+#### Event Architecture Requirements
+- [ ] Kafka running on Minikube (Strimzi)
+- [ ] Task events published on all state changes
+- [ ] Notification service consumes reminder events
+- [ ] Recurring task service processes recurrence rules
+- [ ] Events are idempotent (safe to replay)
+
+#### Dapr Requirements
+- [ ] Dapr Pub/Sub working with Kafka backend
+- [ ] Dapr State Store operational
+- [ ] Dapr Jobs API scheduling recurring tasks
+- [ ] Dapr Secrets managing all sensitive config
+- [ ] All services have Dapr sidecars
+
+#### Cloud Deployment Requirements
+- [ ] Application deployed to GKE/AKS/OKE
+- [ ] Kafka running on Redpanda/Confluent Cloud
+- [ ] Dapr configured for cloud environment
+- [ ] All services accessible via public URL
+- [ ] TLS/HTTPS configured
+
+#### CI/CD Requirements
+- [ ] GitHub Actions pipeline builds Docker images
+- [ ] Automated tests run in pipeline
+- [ ] Automated deployment to cloud cluster
+- [ ] Rollback capability verified
+
+#### Integration Requirements
+- [ ] All Phase IV features still work
+- [ ] Chat endpoint understands new task features
+- [ ] AI can set priorities, tags, due dates via chat
+- [ ] Existing CRUD operations unchanged
+- [ ] Authentication works across all services
+
+### 6. Phase Transition Notes
+
+#### What Carries Forward from Phase IV
+
+- ✅ Core Principles I-XXII (all previous principles)
+- ✅ Full-stack web application (Next.js + FastAPI)
+- ✅ Database persistence (Neon PostgreSQL)
+- ✅ JWT authentication
+- ✅ AI Chatbot (OpenAI Agents + MCP)
+- ✅ Docker containerization
+- ✅ Kubernetes orchestration
+- ✅ Helm package management
+- ✅ Infrastructure as Code
+
+#### What's NEW in Phase V
+
+- 🆕 Advanced task features (due dates, priorities, tags, recurrence)
+- 🆕 Search, filter, sort capabilities
+- 🆕 Apache Kafka event streaming
+- 🆕 Dapr distributed runtime
+- 🆕 New microservices (notification, recurring tasks)
+- 🆕 Cloud Kubernetes deployment (GKE/AKS/OKE)
+- 🆕 CI/CD automation (GitHub Actions)
+
+#### Backward Compatibility
+
+Phase V MUST NOT break Phase IV functionality:
+- All API endpoints continue to work
+- Chat interface continues to work
+- Task management unchanged (extended, not modified)
+- Authentication unchanged
+- Database schema extended (not modified)
+- Existing K8s manifests and Helm charts extended
+
+---
+
+**IMPORTANT**: This constitution is cumulative. Phase V builds upon Phase I, II, III, and IV.
+All previous principles remain in effect unless explicitly superseded.
+All phases follow Spec-Driven Development with Claude Code + Spec-Kit Plus.
+
+**Version**: 5.0.0 | **Ratified**: 2025-12-25 | **Phase V Added**: 2026-02-02

@@ -1,0 +1,212 @@
+# Global Configuration
+namespace: todo
+
+# Backend Service Configuration
+backend:
+  enabled: true
+  replicas: 2
+
+  image:
+    # Will be overridden by CI/CD with actual ACR name
+    repository: todoacr.azurecr.io/backend
+    tag: v1
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: database-url
+    - name: JWT_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: jwt-secret
+    - name: OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: openai-api-key
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      valueFrom:
+        secretKeyRef:
+          name: kafka-secrets
+          key: bootstrap-servers
+
+  # Dapr sidecar configuration
+  dapr:
+    enabled: true
+    appId: backend
+    appPort: 8000
+    protocol: http
+
+  # Health checks
+  probes:
+    liveness:
+      path: /health
+      port: 8000
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    readiness:
+      path: /health
+      port: 8000
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+# Frontend Service Configuration
+frontend:
+  enabled: true
+  replicas: 2
+
+  image:
+    repository: todoacr.azurecr.io/frontend
+    tag: v1
+    pullPolicy: Always
+
+  service:
+    # LoadBalancer for external access on Azure
+    type: LoadBalancer
+    port: 80
+    targetPort: 3000
+
+  resources:
+    limits:
+      cpu: 300m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  env:
+    - name: NEXT_PUBLIC_API_URL
+      value: "http://backend:8000"
+
+  # No Dapr sidecar for frontend (static content only)
+  dapr:
+    enabled: false
+
+  probes:
+    liveness:
+      path: /
+      port: 3000
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    readiness:
+      path: /
+      port: 3000
+      initialDelaySeconds: 10
+      periodSeconds: 5
+
+# Notification Service Configuration
+notificationService:
+  enabled: true
+  replicas: 1
+
+  image:
+    repository: todoacr.azurecr.io/notification-service
+    tag: v1
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 8001
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  dapr:
+    enabled: true
+    appId: notification-service
+    appPort: 8001
+    protocol: http
+
+# Recurring Service Configuration
+recurringService:
+  enabled: true
+  replicas: 1
+
+  image:
+    repository: todoacr.azurecr.io/recurring-service
+    tag: v1
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 8002
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  dapr:
+    enabled: true
+    appId: recurring-service
+    appPort: 8002
+    protocol: http
+
+# ConfigMap for shared configuration
+configMap:
+  create: true
+  data:
+    ENVIRONMENT: "production"
+    LOG_LEVEL: "INFO"
+    FRONTEND_URL: ""  # Will be set after LoadBalancer IP is assigned
+
+# Secrets reference (secrets created separately via kubectl)
+secrets:
+  appSecrets: app-secrets
+  kafkaSecrets: kafka-secrets
+
+# Service Account
+serviceAccount:
+  create: true
+  name: todo-sa
+  annotations: {}
+
+# Pod annotations for Dapr
+podAnnotations:
+  dapr.io/enabled: "true"
+  dapr.io/config: "appconfig"
+
+# Node selector (none for AKS default pool)
+nodeSelector: {}
+
+# Tolerations (none for default)
+tolerations: []
+
+# Affinity (spread across nodes for HA)
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - backend
+                  - frontend
+          topologyKey: kubernetes.io/hostname

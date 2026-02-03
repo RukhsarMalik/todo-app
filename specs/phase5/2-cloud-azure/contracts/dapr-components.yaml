@@ -1,0 +1,197 @@
+# Contract: Dapr Component Configuration
+# Feature: Phase V Module 2 - Azure Cloud Deployment
+# Date: 2026-02-03
+
+---
+# Pub/Sub Component: Redpanda Cloud (Kafka-compatible)
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-pubsub
+  namespace: todo
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+    # Redpanda Cloud bootstrap server
+    - name: brokers
+      secretKeyRef:
+        name: kafka-secrets
+        key: bootstrap-servers
+
+    # SASL Authentication (required for Redpanda Cloud)
+    - name: authType
+      value: "password"
+    - name: saslMechanism
+      value: "SCRAM-SHA-256"
+    - name: saslUsername
+      secretKeyRef:
+        name: kafka-secrets
+        key: username
+    - name: saslPassword
+      secretKeyRef:
+        name: kafka-secrets
+        key: password
+
+    # TLS Configuration (Redpanda Cloud uses TLS)
+    - name: disableTls
+      value: "false"
+
+    # Consumer Configuration
+    - name: consumerGroup
+      value: "todo-group"
+    - name: initialOffset
+      value: "oldest"
+
+    # Producer Configuration
+    - name: maxMessageBytes
+      value: "1048576"  # 1MB
+
+  # Scopes: which app IDs can use this component
+  scopes:
+    - backend
+    - notification-service
+    - recurring-service
+
+---
+# State Store Component: PostgreSQL (Neon)
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore
+  namespace: todo
+spec:
+  type: state.postgresql
+  version: v1
+  metadata:
+    - name: connectionString
+      secretKeyRef:
+        name: app-secrets
+        key: database-url
+
+    # Table name for state storage
+    - name: tableName
+      value: "dapr_state"
+
+    # Key prefix to avoid conflicts
+    - name: keyPrefix
+      value: "name"
+
+  scopes:
+    - backend
+    - notification-service
+    - recurring-service
+
+---
+# Secrets Component: Kubernetes Secrets
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kubernetes-secrets
+  namespace: todo
+spec:
+  type: secretstores.kubernetes
+  version: v1
+  metadata: []
+
+---
+# Topics Configuration Contract
+#
+# Topic: task-events
+# - Publisher: backend (on task CRUD operations)
+# - Subscribers: notification-service, recurring-service
+# - Message Schema:
+#   {
+#     "id": "uuid",
+#     "type": "created|updated|completed|deleted",
+#     "task_id": "uuid",
+#     "user_id": "uuid",
+#     "timestamp": "ISO8601",
+#     "data": { ...task object... }
+#   }
+#
+# Topic: reminders
+# - Publisher: recurring-service (cron job)
+# - Subscribers: notification-service
+# - Message Schema:
+#   {
+#     "id": "uuid",
+#     "task_id": "uuid",
+#     "user_id": "uuid",
+#     "reminder_type": "due_date|custom",
+#     "scheduled_time": "ISO8601"
+#   }
+#
+# Topic: task-updates
+# - Publisher: recurring-service (for recurring task generation)
+# - Subscribers: backend (to sync database)
+# - Message Schema:
+#   {
+#     "id": "uuid",
+#     "type": "next_occurrence_created",
+#     "parent_task_id": "uuid",
+#     "new_task_id": "uuid",
+#     "timestamp": "ISO8601"
+#   }
+
+---
+# Subscription: Backend subscribes to task-updates
+apiVersion: dapr.io/v2alpha1
+kind: Subscription
+metadata:
+  name: backend-task-updates
+  namespace: todo
+spec:
+  topic: task-updates
+  routes:
+    default: /events/task-updates
+  pubsubname: kafka-pubsub
+scopes:
+  - backend
+
+---
+# Subscription: Notification service subscribes to events
+apiVersion: dapr.io/v2alpha1
+kind: Subscription
+metadata:
+  name: notification-task-events
+  namespace: todo
+spec:
+  topic: task-events
+  routes:
+    default: /events/task-events
+  pubsubname: kafka-pubsub
+scopes:
+  - notification-service
+
+---
+# Subscription: Notification service subscribes to reminders
+apiVersion: dapr.io/v2alpha1
+kind: Subscription
+metadata:
+  name: notification-reminders
+  namespace: todo
+spec:
+  topic: reminders
+  routes:
+    default: /events/reminders
+  pubsubname: kafka-pubsub
+scopes:
+  - notification-service
+
+---
+# Subscription: Recurring service subscribes to task completion
+apiVersion: dapr.io/v2alpha1
+kind: Subscription
+metadata:
+  name: recurring-task-events
+  namespace: todo
+spec:
+  topic: task-events
+  routes:
+    rules:
+      - match: event.type == "completed"
+        path: /events/task-completed
+  pubsubname: kafka-pubsub
+scopes:
+  - recurring-service

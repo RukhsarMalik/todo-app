@@ -1,0 +1,31 @@
+{{- if .Values.kafka.enabled }}
+# Dapr Pub/Sub component backed by Strimzi Kafka
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub
+  labels:
+    release: {{ .Release.Name }}
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+    - name: brokers
+      value: "{{ .Values.kafka.clusterName }}-kafka-bootstrap:9092"
+    - name: consumerGroup
+      value: "todo-app"
+    - name: authRequired
+      value: "false"
+---
+# Dapr Secret Store backed by Kubernetes Secrets
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kubernetes-secrets
+  labels:
+    release: {{ .Release.Name }}
+spec:
+  type: secretstores.kubernetes
+  version: v1
+  metadata: []
+{{- end }}

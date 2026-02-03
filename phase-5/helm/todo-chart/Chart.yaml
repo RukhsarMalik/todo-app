@@ -1,0 +1,16 @@
+apiVersion: v2
+name: todo-chart
+description: Todo Application - Full Stack with Event-Driven Architecture (Phase V)
+type: application
+version: 2.0.0
+appVersion: "2.0.0"
+keywords:
+  - todo
+  - fastapi
+  - nextjs
+  - kubernetes
+  - dapr
+  - kafka
+maintainers:
+  - name: Todo Team
+    email: todo@example.com

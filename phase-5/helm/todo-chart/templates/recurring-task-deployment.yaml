@@ -1,0 +1,55 @@
+{{- if .Values.recurringTask.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-recurring-task
+  labels:
+    app: recurring-task
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.recurringTask.replicaCount }}
+  selector:
+    matchLabels:
+      app: recurring-task
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: recurring-task
+        release: {{ .Release.Name }}
+      {{- if .Values.recurringTask.dapr.enabled }}
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: {{ .Values.recurringTask.dapr.appId | quote }}
+        dapr.io/app-port: {{ .Values.recurringTask.dapr.appPort | quote }}
+        dapr.io/app-protocol: "http"
+      {{- end }}
+    spec:
+      containers:
+        - name: recurring-task
+          image: "{{ .Values.recurringTask.image.repository }}:{{ .Values.recurringTask.image.tag }}"
+          imagePullPolicy: {{ .Values.recurringTask.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.recurringTask.service.port }}
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secrets
+                  key: database_url
+          resources:
+            {{- toYaml .Values.recurringTask.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.recurringTask.service.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.recurringTask.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      restartPolicy: Always
+{{- end }}
