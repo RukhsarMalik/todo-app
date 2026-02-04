@@ -70,7 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
   }, []);
 
-  // Logout: clear storage and state, redirect to login
+  // Logout: clear storage and state, redirect to landing page
   const logout = useCallback(() => {
     clearAuth();
     setAuthState({
@@ -79,8 +79,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isAuthenticated: false,
       isLoading: false,
     });
-    // Use replace to prevent back-button access
-    router.replace('/login');
+    // Use replace to prevent back-button access and redirect to landing page
+    router.replace('/');
   }, [router]);
 
   // Update user info (e.g., after profile update)
